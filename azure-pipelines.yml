@@ -23,8 +23,7 @@ stages:
     - task: Docker@2
       displayName: Build an image
       inputs:
+        repository: 'ewelink_smart_home'
         command: 'build'
         Dockerfile: '**/Dockerfile'
-        tags: |
-          $(tag)
-          latest
+        tags: 'latest'
