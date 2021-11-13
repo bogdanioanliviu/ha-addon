@@ -113,7 +113,7 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(diyDevice);
                 }
-                if (((_b = tmp.txt) === null || _b === void 0 ? void 0 : _b.type) === ELanType_1.default.Plug) {
+                else if (((_b = tmp.txt) === null || _b === void 0 ? void 0 : _b.type) === ELanType_1.default.Plug) {
                     console.log('Found Lan Switch');
                     var lanDevice = Controller_1.default.setDevice({
                         id: key,
@@ -123,7 +123,7 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(lanDevice);
                 }
-                if (((_c = tmp.txt) === null || _c === void 0 ? void 0 : _c.type) === ELanType_1.default.Strip) {
+                else if (((_c = tmp.txt) === null || _c === void 0 ? void 0 : _c.type) === ELanType_1.default.Strip) {
                     console.log('Found Lan Multi-Switch');
                     var lanDevice = Controller_1.default.setDevice({
                         id: key,
@@ -133,7 +133,7 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(lanDevice);
                 }
-                if (((_d = tmp.txt) === null || _d === void 0 ? void 0 : _d.type) === ELanType_1.default.MultifunSwitch) {
+                else if (((_d = tmp.txt) === null || _d === void 0 ? void 0 : _d.type) === ELanType_1.default.MultifunSwitch) {
                     console.log('Found Lan DualR3');
                     var dualR3 = Controller_1.default.setDevice({
                         id: key,
@@ -143,8 +143,9 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(dualR3);
                 }
-                if (((_e = tmp.txt) === null || _e === void 0 ? void 0 : _e.type) === ELanType_1.default.EnhancedPlug) {
-                    console.log('Found Lan 单通道插座增强版（用电统计）');
+                else if (((_e = tmp.txt) === null || _e === void 0 ? void 0 : _e.type) === ELanType_1.default.EnhancedPlug) {
+                    // console.log('Found Lan 单通道插座增强版（用电统计）');
+                    console.log('Found Lan enhanced plug');
                     var device = Controller_1.default.setDevice({
                         id: key,
                         data: tmp,
@@ -153,8 +154,9 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(device);
                 }
-                if (((_f = tmp.txt) === null || _f === void 0 ? void 0 : _f.type) === ELanType_1.default.THPlug) {
-                    console.log('Found Lan 单通道温湿度控制器');
+                else if (((_f = tmp.txt) === null || _f === void 0 ? void 0 : _f.type) === ELanType_1.default.THPlug) {
+                    // console.log('Found Lan 单通道温湿度控制器');
+                    console.log('Found Lan TH plug');
                     var device = Controller_1.default.setDevice({
                         id: key,
                         data: tmp,
@@ -163,7 +165,7 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(device);
                 }
-                if (((_g = tmp.txt) === null || _g === void 0 ? void 0 : _g.type) === ELanType_1.default.RF) {
+                else if (((_g = tmp.txt) === null || _g === void 0 ? void 0 : _g.type) === ELanType_1.default.RF) {
                     console.log('Found Lan RF-Bridge');
                     var device = Controller_1.default.setDevice({
                         id: key,
@@ -173,8 +175,20 @@ var Mdns = /** @class */ (function () {
                     });
                     callback && callback(device);
                 }
-                if (((_h = tmp.txt) === null || _h === void 0 ? void 0 : _h.type) === ELanType_1.default.Light) {
-                    console.log('Found Lan 双色灯球 or RBG五色灯');
+                else if (((_h = tmp.txt) === null || _h === void 0 ? void 0 : _h.type) === ELanType_1.default.FanLight) {
+                    // console.log('Found Lan 风扇灯');
+                    console.log('Found Lan fan light');
+                    var device = Controller_1.default.setDevice({
+                        id: key,
+                        data: tmp,
+                        type: 2,
+                        lanType: ELanType_1.default.FanLight,
+                    });
+                    callback && callback(device);
+                }
+                else if (((_j = tmp.txt) === null || _j === void 0 ? void 0 : _j.type) === ELanType_1.default.Light) {
+                    // console.log('Found Lan 双色灯球 or RBG五色灯');
+                    console.log('Found Lan multi-color lamp');
                     // todo 如何区分双色灯跟五色灯
                     // * 目前发现无法通过局域网进行控制
                     // const device = Controller.setDevice({
@@ -184,16 +198,6 @@ var Mdns = /** @class */ (function () {
                     //     lanType: ELanType.Light,
                     // });
                     // callback && callback(device);
-                }
-                if (((_j = tmp.txt) === null || _j === void 0 ? void 0 : _j.type) === ELanType_1.default.FanLight) {
-                    console.log('Found Lan 风扇灯');
-                    var device = Controller_1.default.setDevice({
-                        id: key,
-                        data: tmp,
-                        type: 2,
-                        lanType: ELanType_1.default.FanLight,
-                    });
-                    callback && callback(device);
                 }
             }
         });

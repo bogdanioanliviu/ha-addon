@@ -39,29 +39,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var eventBus_1 = __importDefault(require("../utils/eventBus"));
-var formatDevice_1 = require("../utils/formatDevice");
-var sse = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var handler;
+exports.syncLovelaceCard = void 0;
+var syncDevice2Ha_1 = __importDefault(require("../utils/syncDevice2Ha"));
+var syncLovelaceCard = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var err_1;
     return __generator(this, function (_a) {
-        res.header({
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            Connection: 'keep-alive',
-            'Access-Control-Allow-Origin': '*',
-        });
-        res.write('retry: 10000\n');
-        handler = function () {
-            var result = formatDevice_1.getFormattedDeviceList();
-            res.write('data: ' + JSON.stringify(result) + '\n\n');
-        };
-        eventBus_1.default.addListener('sse', handler);
-        res.on('close', function () {
-            eventBus_1.default.removeListener('sse', handler);
-            res.end();
-            console.log('SSE closed');
-        });
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, syncDevice2Ha_1.default({
+                        syncLovelace: true,
+                        sleepTime: 2000,
+                    })];
+            case 1:
+                _a.sent();
+                res.json({
+                    error: 0,
+                    msg: 'Sync success',
+                    data: null,
+                });
+                return [3 /*break*/, 3];
+            case 2:
+                err_1 = _a.sent();
+                res.json({
+                    error: 500,
+                    data: null,
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
     });
 }); };
-exports.default = sse;
+exports.syncLovelaceCard = syncLovelaceCard;
