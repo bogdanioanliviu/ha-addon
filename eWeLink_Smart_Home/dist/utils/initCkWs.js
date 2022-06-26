@@ -78,6 +78,8 @@ var LanTandHModificationController_1 = __importDefault(require("../controller/La
 var CloudRFBridgeController_1 = __importDefault(require("../controller/CloudRFBridgeController"));
 var CloudUIID44Controller_1 = __importDefault(require("../controller/CloudUIID44Controller"));
 var CloudUIID34Controller_1 = __importDefault(require("../controller/CloudUIID34Controller"));
+var process_1 = __importDefault(require("process"));
+var logger_1 = require("./logger");
 var apikey = dataUtil_1.getDataSync('user.json', ['user', 'apikey']);
 exports.default = (function () { return __awaiter(void 0, void 0, void 0, function () {
     var at, region;
@@ -87,19 +89,20 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                 at = dataUtil_1.getDataSync('user.json', ['at']);
                 region = dataUtil_1.getDataSync('user.json', ['region']);
                 if (!at || !apikey) {
-                    return [2 /*return*/, -1];
+                    return [2, -1];
                 }
-                return [4 /*yield*/, coolkit_ws_1.default.init({
+                return [4, coolkit_ws_1.default.init({
                         appid: app_1.appId,
                         at: at,
                         apikey: apikey,
                         region: region,
                         userAgent: 'app',
                         reqTimeout: 30000,
+                        useTestEnv: process_1.default.env.CK_API_ENV === 'test',
                     })];
             case 1:
                 _a.sent();
-                console.log('Jia ~ file: initCkWs.ts ~ line 29 ~ at', at);
+                logger_1.logger.info("initCkWs at: " + at);
                 coolkit_ws_1.default.on('message', function (ws) { return __awaiter(void 0, void 0, void 0, function () {
                     var type, data, tmp, device, _a, currentTemperature, currentHumidity, state, _b, bright, status_1, _c, current, voltage, power, status_2, switches, ids, online, res, error_1;
                     return __generator(this, function (_d) {
@@ -107,12 +110,12 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                             case 0:
                                 _d.trys.push([0, 4, , 5]);
                                 type = ws.type, data = ws.data;
-                                console.log('receive CK-WS msg:   type-->', type);
-                                console.log('receive CK-WS msg:\n', data);
-                                if (!(type === 'message' && data !== 'pong')) return [3 /*break*/, 3];
+                                logger_1.logger.debug("receive CK-WS msg: type: " + type);
+                                logger_1.logger.debug("receive CK-WS msg: data: " + JSON.stringify(data));
+                                if (!(type === 'message' && data !== 'pong')) return [3, 3];
                                 tmp = JSON.parse(data);
                                 if (!tmp.deviceid) {
-                                    return [2 /*return*/];
+                                    return [2];
                                 }
                                 device = Controller_1.default.getDevice(tmp.deviceid);
                                 if (tmp.action === 'update') {
@@ -140,8 +143,7 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                                     }
                                     else if (device instanceof CloudPowerDetectionSwitchController_1.default) {
                                         _c = tmp.params, current = _c.current, voltage = _c.voltage, power = _c.power, status_2 = _c.switch;
-                                        // console.log('接收到功率检查插座的消息->params:', tmp.params);
-                                        console.log('get power detection switch message, params:', tmp.params);
+                                        logger_1.logger.info("Get power detection switch message, params: " + JSON.stringify(tmp.params));
                                         device.updateState({
                                             status: status_2,
                                             current: current,
@@ -156,98 +158,84 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                                         }
                                     }
                                     else if (device instanceof CloudRGBLightStripController_1.default) {
-                                        // console.log('接收到灯带的消息：', tmp.params);
-                                        console.log('get lamp strip message, params:', tmp.params);
+                                        logger_1.logger.info("Get lamp strip message, params: " + JSON.stringify(tmp.params));
                                         device.updateState(device.parseCkData2Ha(tmp.params));
                                     }
                                     else if (device instanceof CloudDoubleColorBulbController_1.default) {
-                                        // console.log('接收到双色灯的信息：', tmp.params);
-                                        console.log('get double color bulb message, params:', tmp.params);
+                                        logger_1.logger.info("Get double color bulb message, params: " + JSON.stringify(tmp.params));
                                         device.updateState(tmp.params);
                                     }
                                     else if (device instanceof CloudUIID104Controller_1.default) {
-                                        // console.log('接收到随调五色灯的信息：', tmp.params);
-                                        console.log('get uiid 104 message, params:', tmp.params);
+                                        logger_1.logger.info("Get UIID 104 message, params: " + tmp.params);
                                         device.updateState(tmp.params);
                                     }
                                     else if (device instanceof CloudDualR3Controller_1.default || device instanceof LanDualR3Controller_1.default) {
-                                        // console.log('接收到DualR3的信息：', tmp.params);
-                                        console.log('get DualR3 message, params:', tmp.params);
+                                        logger_1.logger.info("Get DualR3 message, params: " + tmp.params);
                                         if (tmp.params && tmp.params.switches) {
                                             device.updateState(tmp.params.switches);
                                         }
                                     }
                                     else if (device instanceof CloudDW2WiFiController_1.default) {
-                                        // console.log('接收到DW2的信息：', tmp.params);
-                                        console.log('get DW2 message, params:', tmp.params);
+                                        logger_1.logger.info("Get DW2 message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudZigbeeUIID1000Controller_1.default) {
-                                        // console.log('接收到Zigbee无线按键的信息：', tmp.params);
-                                        console.log('get Zigbee uiid 1000 message, params:', tmp.params);
+                                        logger_1.logger.info("Get Zigbee UIID 1000 message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudZigbeeUIID1770Controller_1.default) {
-                                        // console.log('接收到Zigbee温湿度传感器的信息：', tmp.params);
-                                        console.log('get Zigbee uiid 1770 message, params:', tmp.params);
+                                        logger_1.logger.info("Get Zigbee UIID 1770 message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudZigbeeUIID2026Controller_1.default) {
-                                        // console.log('接收到Zigbee移动传感器的信息：', tmp.params);
-                                        console.log('get Zigbee uiid 2026 message, params:', tmp.params);
+                                        logger_1.logger.info("Get Zigbee UIID 2026 message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudZigbeeUIID3026Controller_1.default) {
-                                        // console.log('接收到Zigbee门磁的信息：', tmp.params);
-                                        console.log('get Zigbee uiid 3026 message, params:', tmp.params);
+                                        logger_1.logger.info("Get Zigbee UIID 3026 message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudZigbeeUIID4026Controller_1.default) {
-                                        // console.log('接收到Zigbee水浸传感器的信息：', tmp.params);
-                                        console.log('get Zigbee uiid 4026 message, params:', tmp.params);
+                                        logger_1.logger.info("Get Zigbee UIID 4026 message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudCoverController_1.default) {
-                                        // console.log('接收到电动窗帘的信息：', tmp.params);
-                                        console.log('get cover message, params:', tmp.params);
+                                        logger_1.logger.info("Get cover message, params: " + tmp.params);
                                         if (tmp.params) {
                                             device.updateState(tmp.params);
                                         }
                                     }
                                     else if (device instanceof CloudRFBridgeController_1.default) {
-                                        // console.log('接收到RFBridge的信息：', tmp.params);
-                                        console.log('get RF-Bridge message, params:', tmp.params);
+                                        logger_1.logger.info("Get RF-Bridge message, params: " + tmp.params);
                                         ids = device.parseCkData2Ha(tmp.params);
                                         device.updateState(ids);
                                     }
                                     else if (device instanceof CloudUIID34Controller_1.default) {
-                                        // console.log('接收到风扇灯的信息：', tmp.params);
-                                        console.log('get uiid 34 message, params:', tmp.params);
+                                        logger_1.logger.info("Get UIID 34 message, params: " + tmp.params);
                                         device.updateState(tmp.params.switches);
                                     }
                                     else if (device instanceof CloudUIID44Controller_1.default) {
-                                        // console.log('接收到单路调光器的信息：', tmp.params);
-                                        console.log('get uiid 44 message, params:', tmp.params);
+                                        logger_1.logger.info("Get UIID 44 message, params: " + tmp.params);
                                         device.updateState(tmp.params);
                                     }
                                     eventBus_1.default.emit('update-controller', data);
                                 }
-                                if (!(tmp.action === 'sysmsg' && (device === null || device === void 0 ? void 0 : device.entityId))) return [3 /*break*/, 2];
+                                if (!(tmp.action === 'sysmsg' && (device === null || device === void 0 ? void 0 : device.entityId))) return [3, 2];
                                 online = tmp.params.online;
-                                if (!(online === false)) return [3 /*break*/, 2];
-                                return [4 /*yield*/, restApi_1.getStateByEntityId(device.entityId)];
+                                if (!(online === false)) return [3, 2];
+                                return [4, restApi_1.getStateByEntityId(device.entityId)];
                             case 1:
                                 res = _d.sent();
                                 if (res && res.data) {
@@ -260,19 +248,18 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                                 eventBus_1.default.emit('device-offline', device.deviceId);
                                 _d.label = 2;
                             case 2:
-                                // 同步状态到前端
                                 eventBus_1.default.emit('sse');
                                 _d.label = 3;
-                            case 3: return [3 /*break*/, 5];
+                            case 3: return [3, 5];
                             case 4:
                                 error_1 = _d.sent();
-                                console.log(error_1);
-                                return [3 /*break*/, 5];
-                            case 5: return [2 /*return*/];
+                                logger_1.logger.error("initCkWs error: " + error_1);
+                                return [3, 5];
+                            case 5: return [2];
                         }
                     });
                 }); });
-                return [2 /*return*/];
+                return [2];
         }
     });
 }); });

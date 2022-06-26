@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var lanControlAuthenticationUtils_1 = __importDefault(require("../utils/lanControlAuthenticationUtils"));
-var LanDeviceController = /** @class */ (function () {
+var logger_1 = require("../utils/logger");
+var LanDeviceController = (function () {
     function LanDeviceController(props) {
         this.type = 2;
         var deviceId = props.deviceId, ip = props.ip, _a = props.port, port = _a === void 0 ? 8081 : _a, disabled = props.disabled, encryptedData = props.encryptedData, iv = props.iv, target = props.target, index = props.index;
@@ -35,7 +36,7 @@ LanDeviceController.prototype.parseEncryptedData = function () {
         return null;
     }
     catch (error) {
-        console.log('Jia ~ file: LanDeviceController.ts ~ line 82 ~ error', error);
+        logger_1.logger.warn("LanDeviceController error: " + error);
         return null;
     }
 };

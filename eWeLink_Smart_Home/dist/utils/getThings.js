@@ -90,7 +90,10 @@ var uiid_1 = require("../config/uiid");
 var CloudUIID44Controller_1 = __importDefault(require("../controller/CloudUIID44Controller"));
 var CloudUIID34Controller_1 = __importDefault(require("../controller/CloudUIID34Controller"));
 var LanUIID34Controller_1 = __importDefault(require("../controller/LanUIID34Controller"));
-// 获取设备并同步到HA
+var CloudNSPanelController_1 = __importDefault(require("../controller/CloudNSPanelController"));
+var logger_1 = require("./logger");
+var CloudUIID181Controller_1 = __importDefault(require("../controller/CloudUIID181Controller"));
+var CloudUIID190Controller_1 = __importDefault(require("../controller/CloudUIID190Controller"));
 exports.default = (function () { return __awaiter(void 0, void 0, void 0, function () {
     var userData, lang, loginParams, _a, error, data, thingList, _loop_1, i;
     return __generator(this, function (_b) {
@@ -100,16 +103,16 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                 lang = userData.lang === 'cn' ? 'cn' : 'en';
                 loginParams = userData.login;
                 if (!loginParams) {
-                    return [2 /*return*/, -1];
+                    return [2, -1];
                 }
-                return [4 /*yield*/, coolkit_api_1.default.device.getThingList({
+                return [4, coolkit_api_1.default.device.getThingList({
                         lang: lang,
                     })];
             case 1:
                 _a = _b.sent(), error = _a.error, data = _a.data;
                 if (error === 0) {
                     thingList = data.thingList;
-                    console.log('Jia ~ file: getThings.ts ~ line 25 ~ thingList', JSON.stringify(thingList, null, 2));
+                    logger_1.logger.verbose("getThing: thingList: " + JSON.stringify(thingList));
                     _loop_1 = function (i) {
                         var item = thingList[i];
                         var deviceIndex = item.index;
@@ -119,7 +122,6 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                             if (old_1 instanceof DiyDeviceController_1.default) {
                                 return "continue";
                             }
-                            // 如果设备已经存在并且是Lan设备就添加该设备的deviceKey
                             if (old_1 instanceof LanDeviceController_1.default && !uiid_1.unsupportedLanModeUiidSet.has(extra.uiid) && !uiid_1.unsupportedLanModeModelSet.has(extra.model)) {
                                 old_1.devicekey = devicekey;
                                 old_1.selfApikey = apikey;
@@ -203,7 +205,6 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                                 }
                                 return "continue";
                             }
-                            // 添加为Cloud设备
                             var device = Controller_1.default.setDevice({
                                 id: deviceid,
                                 type: 12,
@@ -282,14 +283,20 @@ exports.default = (function () { return __awaiter(void 0, void 0, void 0, functi
                             if (device instanceof CloudUIID34Controller_1.default) {
                                 !device.disabled && device.updateState(params.switches);
                             }
+                            if (device instanceof CloudNSPanelController_1.default) {
+                            }
+                            if (device instanceof CloudUIID181Controller_1.default) {
+                            }
+                            if (device instanceof CloudUIID190Controller_1.default) {
+                            }
                         }
                     };
                     for (i = 0; i < thingList.length; i++) {
                         _loop_1(i);
                     }
-                    return [2 /*return*/, 0];
+                    return [2, 0];
                 }
-                return [2 /*return*/, -1];
+                return [2, -1];
         }
     });
 }); });

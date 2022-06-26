@@ -41,6 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCoreInfoAPI = void 0;
 var axios_1 = __importDefault(require("axios"));
+var logger_1 = require("../utils/logger");
 var SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN;
 var supervisorRequest = axios_1.default.create({
     baseURL: 'http://supervisor',
@@ -57,10 +58,10 @@ var getCoreInfoAPI = function () { return __awaiter(void 0, void 0, void 0, func
             url: '/core/info',
         });
         res.catch(function (e) {
-            console.log(e);
+            logger_1.logger.warn("Get HA core info error: " + e);
             return null;
         });
-        return [2 /*return*/, res];
+        return [2, res];
     });
 }); };
 exports.getCoreInfoAPI = getCoreInfoAPI;

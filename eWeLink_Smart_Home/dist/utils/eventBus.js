@@ -44,11 +44,12 @@ var CloudDeviceController_1 = __importDefault(require("../controller/CloudDevice
 var Controller_1 = __importDefault(require("../controller/Controller"));
 var LanDeviceController_1 = __importDefault(require("../controller/LanDeviceController"));
 var initHaSocket_1 = __importDefault(require("./initHaSocket"));
+var logger_1 = require("./logger");
 var mergeDeviceParams_1 = __importDefault(require("./mergeDeviceParams"));
 var eventBus = new eventemitter3_1.default();
 eventBus.on('update-controller', function (str) {
     var data = JSON.parse(str);
-    console.log('Jia ~ file: eventBus.ts ~ line 11 ~ eventBus.on ~ data', data);
+    logger_1.logger.verbose("eventBus data: " + JSON.stringify(data));
     var device = Controller_1.default.getDevice(data.deviceid);
     if (device instanceof LanDeviceController_1.default || device instanceof CloudDeviceController_1.default) {
         device.params = mergeDeviceParams_1.default(device.params, data.params);
@@ -64,8 +65,8 @@ eventBus.on('device-offline', function (id) {
 eventBus.on('init-ha-socket', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, initHaSocket_1.default(true)];
-            case 1: return [2 /*return*/, _a.sent()]; // 跟HA建立socket连接
+            case 0: return [4, initHaSocket_1.default(true)];
+            case 1: return [2, _a.sent()];
         }
     });
 }); });

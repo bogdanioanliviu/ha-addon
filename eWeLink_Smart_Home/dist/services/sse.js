@@ -41,8 +41,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var eventBus_1 = __importDefault(require("../utils/eventBus"));
 var formatDevice_1 = require("../utils/formatDevice");
+var logger_1 = require("../utils/logger");
 var sse = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var handler;
+    var handler, handleUpdateHaDevice;
     return __generator(this, function (_a) {
         res.header({
             'Content-Type': 'text/event-stream',
@@ -53,15 +54,20 @@ var sse = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
         res.write('retry: 10000\n');
         handler = function () {
             var result = formatDevice_1.getFormattedDeviceList();
-            res.write('data: ' + JSON.stringify(result) + '\n\n');
+            res.write('data: ' + JSON.stringify({ type: 'ck-device', data: result }) + '\n\n');
+        };
+        handleUpdateHaDevice = function () {
+            res.write('data: ' + JSON.stringify({ type: 'ha-device', data: { name: 'John', id: '001', gender: 'male' } }) + '\n\n');
         };
         eventBus_1.default.addListener('sse', handler);
+        eventBus_1.default.addListener('sse-update-ha-device', handleUpdateHaDevice);
         res.on('close', function () {
             eventBus_1.default.removeListener('sse', handler);
+            eventBus_1.default.removeListener('sse-update-ha-device', handleUpdateHaDevice);
             res.end();
-            console.log('SSE closed');
+            logger_1.logger.info('SSE closed');
         });
-        return [2 /*return*/];
+        return [2];
     });
 }); };
 exports.default = sse;

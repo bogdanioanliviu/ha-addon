@@ -1,5 +1,27 @@
 # Changelogs
 
+## v1.2.8
+
+-   Support some new devices
+
+## v1.2.7
+
+-   Fix device online status bug
+
+## v1.2.6
+
+-   Fix login button style bug
+
+## v1.2.5
+
+-   Support NS Panel
+
+-   Update log output format
+
+## v1.2.4
+
+-   Added new feature "Sync Home Assistant Devices"
+
 ## v1.2.3
 
 -   Update Dockerfile build script

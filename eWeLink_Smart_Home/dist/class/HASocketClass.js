@@ -55,7 +55,8 @@ var url_1 = require("../config/url");
 var AuthClass_1 = __importDefault(require("./AuthClass"));
 var initHaSocket_1 = __importDefault(require("../utils/initHaSocket"));
 var syncDevice2Ha_1 = __importDefault(require("../utils/syncDevice2Ha"));
-var HaSocket = /** @class */ (function () {
+var logger_1 = require("../utils/logger");
+var HaSocket = (function () {
     function HaSocket() {
         this.count = 1;
         this.connect();
@@ -65,12 +66,11 @@ var HaSocket = /** @class */ (function () {
         try {
             this.client = new ws_1.default(url_1.HaSocketURL);
             this.client.on('error', function () {
-                // console.log('请检查HA是否正确运行');
-                console.log('Please check HA running state');
+                logger_1.logger.warn('Please check HA running state');
             });
         }
         catch (error) {
-            console.log('init HA-WS error', error);
+            logger_1.logger.warn("init HA-WS error: " + error);
         }
     };
     HaSocket.createInstance = function () {
@@ -88,7 +88,7 @@ var HaSocket = /** @class */ (function () {
                 if (reconnect) {
                     this.connect();
                 }
-                return [2 /*return*/, new Promise(function (resolve, reject) {
+                return [2, new Promise(function (resolve, reject) {
                         _this.client.on('open', function () {
                             if (_this.client.readyState !== 1) {
                                 resolve(-1);
@@ -103,7 +103,6 @@ var HaSocket = /** @class */ (function () {
                                 var data = JSON.parse(res);
                                 if (data.type === 'auth_ok') {
                                     resolve(0);
-                                    // 由于ha重启会丢失实体,所以需要重新同步一次实体
                                     if (reconnect) {
                                         syncDevice2Ha_1.default({
                                             syncLovelace: false,
@@ -114,7 +113,7 @@ var HaSocket = /** @class */ (function () {
                                 }
                             }
                             catch (error) {
-                                console.log('Jia ~ file: HaSocketClass.ts ~ line 42 ~ HaSocket ~ init ~ error', error);
+                                logger_1.logger.warn("HaSocket init error: " + error);
                                 resolve(-1);
                             }
                         }));
@@ -128,18 +127,17 @@ var HaSocket = /** @class */ (function () {
             var res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.query({
+                    case 0: return [4, this.query({
                             type: 'ping',
                         })];
                     case 1:
                         res = _a.sent();
-                        console.log('HA-WS heartBeat:', res);
+                        logger_1.logger.info("HA-WS heart beat result: " + JSON.stringify(res));
                         if (res === -1) {
-                            // 重新建立连接，并绑定call_service事件
                             initHaSocket_1.default(true);
                         }
                         this.heartBeat();
-                        return [2 /*return*/];
+                        return [2];
                 }
             });
         }); }, 120000);
@@ -160,7 +158,7 @@ var HaSocket = /** @class */ (function () {
                 }
             }
             catch (err) {
-                console.log('Jia ~ file: HaSocketClass.ts ~ line 65 ~ HaSocket ~ handleEvent ~ err', err);
+                logger_1.logger.warn("HaSocket handleEvent error: " + err);
             }
         });
     };
@@ -170,14 +168,12 @@ var HaSocket = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 if (this.client.readyState !== 1) {
-                    // console.log('与HA-WS连接未建立，建议重启Addon');
-                    console.log('Could not connect to HA-WS, please restart addon');
-                    return [2 /*return*/, -1];
+                    logger_1.logger.warn('Could not connect to HA-WS, please restart addon');
+                    return [2, -1];
                 }
                 cur = this.count++;
-                return [2 /*return*/, new Promise(function (resolve) {
+                return [2, new Promise(function (resolve) {
                         _this.client.send(JSON.stringify(__assign({ id: cur }, data)));
-                        // 设置超时
                         setTimeout(function () {
                             _this.client.removeEventListener('message', handler);
                             resolve(-1);
@@ -186,7 +182,6 @@ var HaSocket = /** @class */ (function () {
                             try {
                                 var data_1 = JSON.parse(res);
                                 if (data_1.id === cur) {
-                                    // 心跳信息
                                     if (!data_1.result && data_1.type) {
                                         resolve(data_1.type);
                                     }
@@ -195,7 +190,7 @@ var HaSocket = /** @class */ (function () {
                                 }
                             }
                             catch (error) {
-                                console.log('Jia ~ file: HASocketClass.ts ~ line 92 ~ HaSocket ~ query ~ error', error);
+                                logger_1.logger.warn("HaSocket query error: " + error);
                                 resolve(-1);
                                 _this.client.removeEventListener('message', handler);
                             }
@@ -221,21 +216,16 @@ var HaSocket = /** @class */ (function () {
             var res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.query({
+                    case 0: return [4, this.query({
                             type: 'lovelace/config',
                         })];
                     case 1:
                         res = _a.sent();
-                        return [2 /*return*/, res];
+                        return [2, res];
                 }
             });
         });
     };
-    /**
-     *
-     * @memberof HaSocket
-     * @deprecated 无须申请长期令牌
-     */
     HaSocket.prototype.getLongLivedToken = function () {
         return __awaiter(this, void 0, void 0, function () {
             var res;
@@ -243,16 +233,16 @@ var HaSocket = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (this.client.readyState !== 1) {
-                            return [2 /*return*/, null];
+                            return [2, null];
                         }
-                        return [4 /*yield*/, this.query({
+                        return [4, this.query({
                                 type: 'auth/long_lived_access_token',
                                 client_name: 'eWeLink Smart Home',
                                 lifespan: 3650,
                             })];
                     case 1:
                         res = _a.sent();
-                        return [2 /*return*/, res];
+                        return [2, res];
                 }
             });
         });
